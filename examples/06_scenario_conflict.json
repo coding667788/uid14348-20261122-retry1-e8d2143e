@@ -1,0 +1,394 @@
+{
+  "actions": [
+    {
+      "id": "f1",
+      "proxy": "P1",
+      "type": "switch_outbound",
+      "version": 3
+    },
+    {
+      "id": "f2",
+      "proxy": "P1",
+      "type": "withdraw_inbound",
+      "version": 1
+    },
+    {
+      "id": "f3",
+      "proxy": "P1",
+      "type": "pause"
+    },
+    {
+      "id": "f4",
+      "proxy": "P1",
+      "type": "resume"
+    }
+  ],
+  "baseline": [
+    {
+      "action": "f3",
+      "slot": 1
+    },
+    {
+      "action": "f4",
+      "slot": 4
+    },
+    {
+      "action": "f1",
+      "slot": 5
+    },
+    {
+      "action": "f2",
+      "slot": 8
+    }
+  ],
+  "case_id": "06_scenario_conflict",
+  "identities": [
+    "svc-a",
+    "svc-b"
+  ],
+  "initial_state": {
+    "inbound": [
+      {
+        "proxy": "P1",
+        "versions": [
+          1
+        ]
+      },
+      {
+        "proxy": "P2",
+        "versions": [
+          1
+        ]
+      }
+    ],
+    "outbound": [
+      {
+        "active_version": 1,
+        "proxy": "P1"
+      },
+      {
+        "active_version": 1,
+        "proxy": "P2"
+      }
+    ]
+  },
+  "links": [
+    {
+      "carries": [
+        "*"
+      ],
+      "delay_max": 1,
+      "delay_min": 1,
+      "dst": "P1",
+      "failure_domain": "d1",
+      "id": "L0",
+      "src": "IG1"
+    },
+    {
+      "carries": [
+        "*"
+      ],
+      "delay_max": 2,
+      "delay_min": 1,
+      "dst": "P2",
+      "failure_domain": "d1",
+      "id": "L1",
+      "src": "P1"
+    },
+    {
+      "carries": [
+        "S1"
+      ],
+      "delay_max": 1,
+      "delay_min": 1,
+      "dst": "S1",
+      "failure_domain": "d2",
+      "id": "L2",
+      "src": "P2"
+    },
+    {
+      "carries": [
+        "S2"
+      ],
+      "delay_max": 1,
+      "delay_min": 1,
+      "dst": "S2",
+      "failure_domain": "d2",
+      "id": "L3",
+      "src": "P2"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "IG1",
+      "kind": "ingress",
+      "region": "r1"
+    },
+    {
+      "id": "P1",
+      "kind": "proxy",
+      "region": "r1"
+    },
+    {
+      "id": "P2",
+      "kind": "proxy",
+      "region": "r2"
+    },
+    {
+      "id": "S1",
+      "kind": "service",
+      "region": "r1"
+    },
+    {
+      "id": "S2",
+      "kind": "service",
+      "region": "r2"
+    }
+  ],
+  "plan": {
+    "failure": {
+      "domain": "d1",
+      "down_step": 2,
+      "up_step": 5
+    },
+    "horizon": 14,
+    "max_wait_slots": 3,
+    "slots": 10
+  },
+  "policies": {
+    "inbound": [
+      {
+        "proxy": "P1",
+        "rules": [
+          {
+            "effect": "accept",
+            "identity": "*",
+            "marker": "ma",
+            "target": "*",
+            "tenant": "ta"
+          },
+          {
+            "effect": "accept",
+            "identity": "*",
+            "marker": "mb",
+            "target": "*",
+            "tenant": "tb"
+          },
+          {
+            "effect": "deny",
+            "identity": "*",
+            "marker": "*",
+            "target": "*",
+            "tenant": "*"
+          }
+        ],
+        "version": 1
+      },
+      {
+        "proxy": "P1",
+        "rules": [
+          {
+            "effect": "accept",
+            "identity": "*",
+            "marker": "ma",
+            "target": "*",
+            "tenant": "ta"
+          },
+          {
+            "effect": "accept",
+            "identity": "*",
+            "marker": "mb",
+            "target": "*",
+            "tenant": "tb"
+          },
+          {
+            "effect": "deny",
+            "identity": "*",
+            "marker": "*",
+            "target": "*",
+            "tenant": "*"
+          }
+        ],
+        "version": 2
+      },
+      {
+        "proxy": "P2",
+        "rules": [
+          {
+            "effect": "accept",
+            "identity": "*",
+            "marker": "ma-p1",
+            "target": "*",
+            "tenant": "ta"
+          },
+          {
+            "effect": "accept",
+            "identity": "*",
+            "marker": "mb-p1",
+            "target": "*",
+            "tenant": "tb"
+          },
+          {
+            "effect": "deny",
+            "identity": "*",
+            "marker": "*",
+            "target": "*",
+            "tenant": "*"
+          }
+        ],
+        "version": 1
+      }
+    ],
+    "outbound": [
+      {
+        "mappings": [
+          {
+            "identity": "*",
+            "marker": "ma",
+            "set_marker": "ma-p1",
+            "target": "*",
+            "tenant": "ta"
+          },
+          {
+            "identity": "*",
+            "marker": "mb",
+            "set_marker": "mb-p1",
+            "target": "*",
+            "tenant": "tb"
+          }
+        ],
+        "proxy": "P1",
+        "version": 1
+      },
+      {
+        "mappings": [
+          {
+            "identity": "*",
+            "marker": "ma",
+            "set_marker": "ma-p1-v2",
+            "target": "*",
+            "tenant": "ta"
+          },
+          {
+            "identity": "*",
+            "marker": "mb",
+            "set_marker": "mb-p1-v2",
+            "target": "*",
+            "tenant": "tb"
+          }
+        ],
+        "proxy": "P1",
+        "version": 2
+      },
+      {
+        "mappings": [
+          {
+            "identity": "*",
+            "marker": "ma-p1",
+            "set_marker": "ma-s1",
+            "target": "S1",
+            "tenant": "ta"
+          },
+          {
+            "identity": "*",
+            "marker": "mb-p1",
+            "set_marker": "mb-s2",
+            "target": "S2",
+            "tenant": "tb"
+          }
+        ],
+        "proxy": "P2",
+        "version": 1
+      },
+      {
+        "mappings": [
+          {
+            "identity": "*",
+            "marker": "ma",
+            "set_marker": "ma-p1",
+            "target": "S1",
+            "tenant": "ta"
+          }
+        ],
+        "proxy": "P1",
+        "version": 3
+      }
+    ]
+  },
+  "precedence": [
+    [
+      "f1",
+      "f2"
+    ],
+    [
+      "f3",
+      "f4"
+    ]
+  ],
+  "replay": {
+    "events": [
+      {
+        "action": "f3",
+        "step": 1
+      },
+      {
+        "action": "f4",
+        "step": 4
+      },
+      {
+        "action": "f1",
+        "step": 5
+      },
+      {
+        "action": "f2",
+        "step": 8
+      }
+    ],
+    "failure": {
+      "domain": "d1",
+      "down_step": 2,
+      "up_step": 5
+    },
+    "horizon": 13
+  },
+  "requests": [
+    {
+      "allow_nodes": [
+        "S1"
+      ],
+      "deadline_step": 7,
+      "emit_step": 0,
+      "id": "R1",
+      "identity": "svc-a",
+      "ingress": "IG1",
+      "marker": "ma",
+      "target": "S1",
+      "tenant": "ta",
+      "ttl": 4
+    },
+    {
+      "allow_nodes": [
+        "S1"
+      ],
+      "deadline_step": 11,
+      "emit_step": 5,
+      "id": "R2",
+      "identity": "svc-a",
+      "ingress": "IG1",
+      "marker": "ma",
+      "target": "S1",
+      "tenant": "ta",
+      "ttl": 4
+    }
+  ],
+  "services": [
+    {
+      "id": "S1",
+      "tenant": "ta"
+    },
+    {
+      "id": "S2",
+      "tenant": "tb"
+    }
+  ]
+}
